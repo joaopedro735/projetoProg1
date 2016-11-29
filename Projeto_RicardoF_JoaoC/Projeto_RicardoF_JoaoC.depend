@@ -1,0 +1,13 @@
+# depslib dependency file v1.0
+1479487818 source:c:\users\2160825\desktop\c projects\projeto_ricardof_joaoc\proj_rf_jc.c
+	<stdio.h>
+	<stdlib.h>
+	<ctype.h>
+	<string.h>
+
+1479859562 source:c:\users\rchoc\desktop\projeto_ricardof_joaoc\proj_rf_jc.c
+	<stdio.h>
+	<stdlib.h>
+	<ctype.h>
+	<string.h>
+

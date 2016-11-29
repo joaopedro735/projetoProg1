@@ -687,6 +687,6 @@ void limparEcra(void){
     system("cls");
 #else if defined(_UNIX_) || defined(_LINUX_) || defined(_APPLE_)
     system("clear");
-#endif // defined
+#endif // defined \
 
 }

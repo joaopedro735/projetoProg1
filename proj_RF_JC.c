@@ -78,6 +78,7 @@ int pesquisarNomeLab(char nome[MAX_LNOME], tLab vLab[MAX_LAB],int qLab);
 void inserirEquipamento(int *qEquip, tEquip vEquip[MAX_EQUIP]);
 void listarEquipamentos(int qEquip, tEquip vEquip[MAX_EQUIP]);
 int pesquisarNrSerie(char num[MAX_NSERIE], tEquip vEquip[MAX_EQUIP],int qEquip);
+void pesquisarEquipE(char *estado, tEquip vEquip[MAX_EQUIP],int qEquip,int posC[qEquip],int *nr);
 void registaInstalacao(int qLab, tLab vLab[MAX_LAB],int qEquip, tEquip vEquip[MAX_EQUIP]);
 
 
@@ -491,7 +492,6 @@ void inserirEquipamento(int *qEquip, tEquip vEquip[MAX_EQUIP]){
     int encontrado = -1;
     if(*qEquip < 200)
     {
-        vEquip[*qEquip].nrInv++;
         do
         {
             lerString("\nNumero de serie: ", vEquip[*qEquip].nSerie,MAX_NSERIE);
@@ -502,7 +502,8 @@ void inserirEquipamento(int *qEquip, tEquip vEquip[MAX_EQUIP]){
             }
         }
         while(encontrado != -1);
-        lerInteiro("\nCusto do equipamento: ",MIN_NUM,MAX_CUSTO);
+        vEquip[*qEquip].nrInv = (*qEquip) + 1;
+        vEquip[*qEquip].custo = lerFloat("\nCusto do equipamento: ",MIN_NUM,MAX_CUSTO);
         printf("\nIndique a data de inventariacao:");
         vEquip[*qEquip].dInv.dia = lerInteiro("\n",MIN_NUM,MAX_DIA);
         vEquip[*qEquip].dInv.mes = lerInteiro("\n",MIN_NUM,MAX_MES);
@@ -524,13 +525,14 @@ void listarEquipamentos(int qEquip, tEquip vEquip[MAX_EQUIP]){
         printf("\nLISTAGEM DOS EQUIPAMENTOS");
         for(i=0; i< qEquip; i++)
         {
-            printf("\n\nNumero de inventario: %d",vEquip[i].nrInv);
+ /*           printf("\n\nNumero de inventario: %d",vEquip[i].nrInv);
             printf("\nNumero de serie: %s",vEquip[i].nSerie);
             printf("\nLocal: %s",vEquip[i].local);
             printf("\nCusto do equipamento: %.2f",vEquip[i].custo);
             printf("\nData de inventario: %d/%d/%d",vEquip[i].dInv.dia,vEquip[i].dInv.mes,vEquip[i].dInv.ano);
             printf("\nDescricao: %s",vEquip[i].nSerie);
-            printf("\nEstado: %c",vEquip[i].estado);
+            printf("\nEstado: %c",vEquip[i].estado);*/
+            infoEquip(vEquip[i]);
         }
     }
     else
@@ -550,6 +552,118 @@ int pesquisarNrSerie(char num[MAX_NSERIE], tEquip vEquip[MAX_EQUIP],int qEquip){
         }
     }
     return pos;
+}
+
+int pesquisarEquipI(int nrI, tEquip vEquip[MAX_EQUIP],int qEquip){
+    int i,pos = -1;
+    for(i=0; i<qEquip; i++)
+    {
+        if(nrI == vEquip[i].nrInv)
+        {
+            pos = i;
+            i = qEquip;
+        }
+    }
+    return pos;
+}
+
+void pesquisarEquipE(char *estado, tEquip vEquip[MAX_EQUIP],int qEquip,int posC[qEquip],int *nr){
+    int i;
+    *nr = 0;
+    for(i=0; i<qEquip; i++)
+    {
+        if((*estado) == vEquip[i].estado)
+        {
+            posC[*nr] = i;
+            (*nr)++;
+        }
+    }
+}
+
+int pesquisarEquipD(tData procura, tEquip vEquip[MAX_EQUIP],int qEquip,int *nr){
+    int i,pos[qEquip];
+    *nr = 0;
+    for(i=0; i<qEquip; i++)
+    {
+        if(procura.dia == vEquip[i].dInv.dia && procura.mes == vEquip[i].dInv.mes && procura.ano == vEquip[i].dInv.ano)
+        {
+            pos[*nr] = i;
+            *(nr++);
+        }
+    }
+    //return p;
+}
+
+void lerData(tData lData) {
+    lData.dia = lerInteiro("\nDia: ",1,31);
+    lData.mes = lerInteiro("\nMes: ",1,12);
+    lData.ano = lerInteiro("\nAno: ",MIN_D_ANO,MAX_D_ANO);
+}
+
+
+void consultaEquip(tEquip vEquip[MAX_EQUIP],int qEquip){
+    limparEcra();
+    char nconsulta;
+    char op;
+    int nr,posC[qEquip],i;
+    tData procura;
+    op = menuConsultaEquip();
+    switch(op){
+        case 'I':
+            do{
+                nr = lerInteiro("\nIntroduza o numero de Inventario: ",1,999999999);
+                nr = pesquisarEquipI(nr,vEquip,qEquip);
+                if(nr == -1){
+                    printf("\nNão foi encontrado nenhum equipamento com o numero de inventario escolhido");
+                }
+                else{
+                    infoEquip(vEquip[nr]);
+                }
+            }while(nr == -1);
+            break;
+        case 'E':
+            printf("\nEscolha uma das opcoes: \n\t[D]isponivel\n\t[I]ndisponivel\n\t[A]batido\nEscolha uma das opcoes: ");
+            scanf("%c", &nconsulta);
+            nconsulta = toupper(nconsulta);
+            limparBufferStdin();
+            printf("%c",nconsulta);
+            pesquisarEquipE(&nconsulta,vEquip,qEquip,posC,&nr);
+            for(i=0;i<nr;i++){
+                infoEquip(vEquip[posC[i]]);
+            }
+            break;
+        case 'D':
+            lerData(procura);
+            pesquisarEquipD(procura,vEquip,qEquip,posC);
+            break;
+        case 'S':
+            break;
+        case 'L':
+            break;
+        case 'V':
+            break;
+    }
+}
+
+void infoEquip(tEquip vEquip){
+    char estado[13];
+    if(vEquip.estado == 'D')
+    {
+        strcpy(estado,"Disponivel");
+    }
+    else if(vEquip.estado == 'I'){
+        strcpy(estado,"Indisponivel");
+    }
+    else if(vEquip.estado == 'A'){
+        strcpy(estado,"Abatido");
+    }
+    printf("\nNumero de inventario: %d",vEquip.nrInv);
+    printf("\nNumero de serie: %s",vEquip.nSerie);
+    printf("\nDescricao do equipamento: %s",vEquip.desc);
+    printf("\nEstado: %s",estado);
+    printf("\nLocal: %s",vEquip.local);
+    printf("\nCusto: %.2f",vEquip.custo);
+    printf("\nData de aquisicao: %02d/%02d/%02d",vEquip.dInv.dia,vEquip.dInv.mes,vEquip.dInv.ano);
 }
 
 void registaInstalacao(int qLab, tLab vLab[MAX_LAB],int qEquip, tEquip vEquip[MAX_EQUIP]){
@@ -585,3 +699,11 @@ void registaInstalacao(int qLab, tLab vLab[MAX_LAB],int qEquip, tEquip vEquip[MA
 
 //FINAL FUNÇOES EQUIPAMENTOS
 
+void limparEcra(void){
+#if defined(_WIN32) || defined(_WIN64)
+    system("cls");
+#else if defined(_UNIX_) || defined(_LINUX_) || defined(_APPLE_)
+    system("clear");
+#endif // defined
+
+}

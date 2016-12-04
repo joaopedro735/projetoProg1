@@ -72,10 +72,12 @@ void limparBufferStdin(void);
 void limparEcra(void);
 void lerData(tData *ldata);
 //LABORATORIOS
-void inserirLaboratorio(int *qLab, tLab vLab[MAX_LAB]);
+void inserirLaboratorio(int *qPost,int *qLab, tLab vLab[MAX_LAB]);
 void listarLaboratorios(int qLab, tLab vLab[MAX_LAB]);
 void alterarLaboratorios(int qLab, tLab vLab[MAX_LAB]);
 int pesquisarNomeLab(char nome[MAX_LNOME], tLab vLab[MAX_LAB],int qLab);
+void pesquisarLocalLab(char plocal[MAX_LOCAL], tLab vLab[MAX_LAB], int qLab, int posC[qLab], int *nr);
+void infoLab(tLab vLab);
 //EQUIPAMENTOS
 void inserirEquipamento(int *qEquip, tEquip vEquip[MAX_EQUIP]);
 void listarEquipamentos(int qEquip, tEquip vEquip[MAX_EQUIP]);
@@ -84,20 +86,23 @@ void pesquisarEquipE(char *estado, tEquip vEquip[MAX_EQUIP],int qEquip,int posC[
 void pesquisarEquipD(tData *procura, tEquip vEquip[MAX_EQUIP],int qEquip,int posC[qEquip],int *nr);
 void registaInstalacao(int qLab, tLab vLab[MAX_LAB],int qEquip, tEquip vEquip[MAX_EQUIP]);
 void pesquisarEquipL(char local[MAX_LOCAL], tEquip vEquip[MAX_EQUIP],int qEquip,int posC[qEquip],int *nr);
+void infoEquip(tEquip vEquip);
 void consultaEquip(tEquip vEquip[MAX_EQUIP],int qEquip);
 //SAVE/LOAD
 void loadBinary(tEquip vEquip[MAX_EQUIP],tLab vLab[MAX_LAB],int *qEquip,int *qLab,int *qPost,float *qPerc);
 void saveBinary(tEquip vEquip[MAX_EQUIP],tLab vLab[MAX_LAB],int qEquip,int qLab,int qPost,float qPerc);
 char fichExiste(void);
 
-int main(void){
+int main(void)
+{
 
     char op,op2;
     int qPost = 0,qEquip = 0,qLab = 0;
     float qPerc = 0;
     tLab vLab[MAX_LAB];
     tEquip vEquip[MAX_EQUIP];
-    if(fichExiste() == 'S'){
+    if(fichExiste() == 'S')
+    {
         loadBinary(vEquip,vLab,&qEquip,&qLab,&qPost,&qPerc);
     }
     do
@@ -113,11 +118,11 @@ int main(void){
                 {
                 case 'R':
                     printf("\n\nRegista avarias");
-                    saveBinary(vEquip,vLab,qEquip,qLab,qPost,qPerc);
+
                     break;
                 case 'L':
                     printf("\n\nListar avarias");
-                    loadBinary(vEquip,vLab,&qEquip,&qLab,&qPost,&qPerc);
+
                     break;
                 case 'C':
                     printf("\n\nConsultar avarias");
@@ -135,6 +140,10 @@ int main(void){
                 op2 = toupper(menuEquip());
                 switch(op2)
                 {
+                case 'I':
+                    printf("\n\nInventariacao de equipamentos - inserir equipamento");
+                    inserirEquipamento(&qEquip,vEquip);
+                    break;
                 case 'R':
                     printf("\n\n1(estado e local)Regista instalacao-instalar no lab, reparacao(avaria) ou abate de equipamento");
                     registaInstalacao(qLab,vLab,qEquip,vEquip);
@@ -147,10 +156,7 @@ int main(void){
                     printf("\n\nConsulta dados de equipamentos");
                     consultaEquip(vEquip,qEquip);
                     break;
-                case 'I':
-                    printf("\n\nInventariacao de equipamentos - inserir equipamento");
-                    inserirEquipamento(&qEquip,vEquip);
-                    break;
+
                 }
             }
             while(op2 != 'V');
@@ -163,7 +169,7 @@ int main(void){
                 {
                 case 'I':
                     printf("\nInserir laboratorio\n");
-                    inserirLaboratorio(&qLab, vLab);
+                    inserirLaboratorio(&qPost,&qLab, vLab);
                     break;
                 case 'L':
                     printf("\nListar laboratorios\n");
@@ -171,6 +177,7 @@ int main(void){
                     break;
                 case 'C':
                     printf("Consultar laboratorios");
+                    consultarLaboratorios(qLab,vLab);
                     break;
                 case 'A':
                     printf("\nAlterar laboratorios\n");
@@ -179,6 +186,12 @@ int main(void){
                 }
             }
             while(op2 != 'V');
+            break;
+        case 'O':
+            loadBinary(vEquip,vLab,&qEquip,&qLab,&qPost,&qPerc);
+            break;
+        case 'G':
+            saveBinary(vEquip,vLab,qEquip,qLab,qPost,qPerc);
             break;
         }
     }
@@ -301,16 +314,18 @@ char menu(int qLab, int qPost, int qEquip, float qPerc){
         printf("\n \tE - Gestao dos equipamentos");
         printf("\n \tL - Gestao dos laboratorios");
         printf("\n \tD - Dados estatisticos");
+        printf("\n \tO - Obter dados de ficheiro binario");
+        printf("\n \tG - Guardar dados em ficheiro binario");
         printf("\n \tS - Sair");
         printf("\n Opcao:");
         scanf(" %c", &op);
         op = toupper(op);
-        if(op != 'A' && op != 'E' && op != 'L' && op != 'D' && op != 'S')
+        if(op != 'A' && op != 'E' && op != 'L' && op != 'D' && op != 'O' && op != 'G' && op != 'S')
         {
             printf("\nOpcao invalida");
         }
     }
-    while(op != 'A' && op != 'E' && op != 'L' && op != 'S');
+    while(op != 'A' && op != 'E' && op != 'L' && op != 'O' && op != 'G' && op != 'S');
     limparBufferStdin();
     return op;
 }
@@ -349,10 +364,10 @@ char menuEquip(void){
         printf("\nGestao dos equipamentos");
         printf("\n------------------------------------------------------------------------------------");
         printf("\nDados dos equipamentos:");
+        printf("\n \tI - Inventariacao de equipamentos");
         printf("\n \tR - Registar instalacao, reparacao ou abate de equipamento");
         printf("\n \tL - Listar dados de equipamentos");
         printf("\n \tC - Consultar dados de equipamentos");
-        printf("\n \tI - Inventariacao de equipamentos");
         printf("\n \tV - Voltar");
         printf("\n Opcao:");
         scanf(" %c", &op);
@@ -430,7 +445,7 @@ char menuConsultaEquip(void){
         printf("\n \tD - Data");
         printf("\n \tS - Numero de Serie");
         printf("\n \tL - Local");
-        printf("\n \tV - Voltar");
+        printf("\n V - Voltar");
         printf("\n Opcao:");
         scanf(" %c", &op);
         op = toupper(op);
@@ -448,7 +463,7 @@ char menuConsultaEquip(void){
 
 
 //FUNÇOES -> GESTAO LABORATORIOS -----------------------------
-void inserirLaboratorio(int *qLab, tLab vLab[MAX_LAB]){
+void inserirLaboratorio(int *qPost,int *qLab, tLab vLab[MAX_LAB]){
     int encontrado = -1;
     if(*qLab < MAX_LAB)
     {
@@ -464,6 +479,7 @@ void inserirLaboratorio(int *qLab, tLab vLab[MAX_LAB]){
         while(encontrado != -1);
         lerString("\nNome do local:", vLab[*qLab].lLocal,MAX_LNOME);
         vLab[*qLab].lPostoTrab = lerInteiro("\nQuantidade de posto de trabalho: ",MIN_NUM,MAX_PTRABALHO);
+        *qPost += vLab[*qLab].lPostoTrab;
         //vLab[*qLab].lQuantEquip = lerInteiro("\nQuantidade de equipamentos: ",MIN_NUM,MAX_EQUIP);
         vLab[*qLab].lQuantEquip = 0;
     }
@@ -480,11 +496,7 @@ void listarLaboratorios(int qLab, tLab vLab[MAX_LAB]){
         printf("\nLISTAGEM DOS LABORATORIOS");
         for(i=0; i< qLab; i++)
         {
-            printf("\n\nNome do laboratorio: %s",vLab[i].lNome);
-            printf("\nLocal do laboratorio: %s",vLab[i].lLocal);
-            printf("\nNumero total de postos de trabalho: %d",vLab[i].lPostoTrab);
-            printf("\nNumero total de equipamentos: %d",vLab[i].lQuantEquip);
-
+            infoLab(vLab[i]);
         }
     }
     else
@@ -494,6 +506,7 @@ void listarLaboratorios(int qLab, tLab vLab[MAX_LAB]){
 }
 
 void alterarLaboratorios(int qLab, tLab vLab[MAX_LAB]){
+    char op;
     if(qLab > 0)
     {
         int posicao = -1;
@@ -504,7 +517,7 @@ void alterarLaboratorios(int qLab, tLab vLab[MAX_LAB]){
             posicao = pesquisarNomeLab(vLab[qLab].lNome,vLab,qLab);
             if(posicao != -1)
             {
-                char op;
+
                 op = menuAlterarLab();
                 switch(op)
                 {
@@ -533,11 +546,79 @@ void alterarLaboratorios(int qLab, tLab vLab[MAX_LAB]){
             {
                 printf("\nO nome que inseriu não é válido. Tente novamente.");
             }
-        }while(posicao != -1);
+        }while(posicao != -1 && op!='V');
     }
     else
     {
             printf("\nNao existe quaisquer laboratorios para alterar.");
+    }
+}
+
+void consultarLaboratorios(int qLab,tLab vLab[MAX_LAB]){
+    char aConsulta[MAX_LAB],bConsulta[MAX_LOCAL];
+    int pos = -1,posC[qLab],i;
+    char op;
+    do
+    {
+        printf("\nA - Por nome");
+        printf("\nB - Por local");
+        printf("\nV - Voltar");
+        printf("\nOpcao: ");
+        scanf(" %c",&op);
+        op = toupper(op);
+        limparBufferStdin();
+        switch(op)
+        {
+        case 'A':
+            lerString("\nIntroduza o nome do laboratorio que deseja consultar: ",aConsulta,MAX_LNOME);
+            pos = pesquisarNomeLab(aConsulta,vLab,qLab);
+            if(pos == -1)
+            {
+                printf("\nNao foi encontrado nenhum laboratorio com esse nome");
+            }
+            else
+            {
+                infoLab(vLab[pos]);
+            }
+            break;
+        case 'B':
+            do
+            {
+                lerString("\nIntroduza o local dos laboratorios que deseja consultar: ",bConsulta,MAX_LOCAL);
+                pesquisarLocalLab(bConsulta,vLab,qLab,posC,&pos);
+                if(pos != 0)
+                {
+                    for(i=0; i<pos; i++)
+                    {
+                        infoLab(vLab[posC[i]]);
+                    }
+                }
+                else
+                {
+                    printf("\nNao foi encontrado nenhum local com esse nome");
+                    printf("Deseja procurar novamente?\n[S]im \t[N]ao");
+                    printf("\nOpcao: ");
+                    scanf("%c",&op);
+                    limparBufferStdin();
+                }
+            }
+            while(pos == 0 && toupper(op) != 'N');
+            break;
+        }
+    }while(op != 'V');
+
+}
+
+void pesquisarLocalLab(char plocal[MAX_LOCAL], tLab vLab[MAX_LAB], int qLab, int posC[qLab], int *nr){
+    int i;
+    *nr = 0;
+    for(i=0; i<qLab; i++)
+    {
+        if(strcmpi(vLab[i].lLocal,plocal) == 0)
+        {
+            posC[*nr] = i;
+            (*nr)++;
+        }
     }
 }
 
@@ -554,6 +635,14 @@ int pesquisarNomeLab(char nome[MAX_LNOME], tLab vLab[MAX_LAB],int qLab){
     return pos;
 }
 
+void infoLab(tLab vLab){
+    printf("\n-------------------------------------------------");
+    printf("\nNome de laboratorio: %s",vLab.lNome);
+    printf("\nLocal: %s",vLab.lLocal);
+    printf("\nNumero de postos de trabalho: %d",vLab.lPostoTrab);
+    printf("\nNumero de equipamentos: %d",vLab.lQuantEquip);
+    printf("\n-------------------------------------------------");
+}
 //FINAL FUNÇOES LABORATORIOS    -----------------------------
 
 
@@ -675,8 +764,7 @@ void pesquisarEquipL(char plocal[MAX_LOCAL], tEquip vEquip[MAX_EQUIP],int qEquip
     }
 }
 
-void consultaEquip(tEquip vEquip[MAX_EQUIP],int qEquip)
-{
+void consultaEquip(tEquip vEquip[MAX_EQUIP],int qEquip){
     char nconsulta;
     char op;
     char ns[MAX_NSERIE];
@@ -700,26 +788,29 @@ void consultaEquip(tEquip vEquip[MAX_EQUIP],int qEquip)
                     printf("Deseja procurar novamente?\n[S]im \t[N]ao");
                     printf("\nOpcao: ");
                     scanf("%c",&nconsulta);
+                    nconsulta = toupper(nconsulta);
                     limparBufferStdin();
-                    if(toupper(nconsulta) == 'N'){
-                        nr = 0;
-                    }
                 }
                 else
                 {
                     infoEquip(vEquip[nr]);
                 }
             }
-            while(nr == -1);
+            while(nr == -1 && nconsulta!='N');
             break;
 //Consulta por Estado
         case 'E':
             do
             {
+                do{
                 printf("\nEscolha uma das opcoes: \n\t[D]isponivel\n\t[I]ndisponivel\n\t[A]batido\nEscolha uma das opcoes: ");
                 scanf("%c", &nconsulta);
                 nconsulta = toupper(nconsulta);
                 limparBufferStdin();
+                if(nconsulta != 'D' && nconsulta != 'I' && nconsulta != 'A'){
+                    printf("\nOpcao Invalida!\n");
+                }
+                }while(nconsulta != 'D' && nconsulta != 'I' && nconsulta != 'A');
                 pesquisarEquipE(&nconsulta,vEquip,qEquip,posC,&nr);
                 if(nr != 0)
                 {
@@ -730,17 +821,15 @@ void consultaEquip(tEquip vEquip[MAX_EQUIP],int qEquip)
                 }
                 else
                 {
-                    printf("\nNenhum foi encontrado nenhum equipamento para a opcao escolhida.");
+                    printf("\nNao foi encontrado nenhum equipamento para a opcao escolhida.");
                     printf("Deseja procurar novamente?\n[S]im \t[N]ao");
                     printf("\nOpcao: ");
                     scanf("%c",&nconsulta);
+                    nconsulta = toupper(nconsulta);
                     limparBufferStdin();
-                    if(toupper(nconsulta) == 'N'){
-                        nr = -1;
-                    }
                 }
             }
-            while(nr == 0);
+            while(nr == 0 && nconsulta!='N');
             break;
 //Consulta por Data
         case 'D':
@@ -761,13 +850,11 @@ void consultaEquip(tEquip vEquip[MAX_EQUIP],int qEquip)
                     printf("Deseja procurar novamente?\n[S]im \t[N]ao");
                     printf("\nOpcao: ");
                     scanf("%c",&nconsulta);
+                    nconsulta = toupper(nconsulta);
                     limparBufferStdin();
-                    if(toupper(nconsulta) == 'N'){
-                        nr = -1;
-                    }
                 }
             }
-            while(nr == 0);
+            while(nr == 0 && nconsulta!='N');
             break;
 //Consulta por N Serie
         case 'S':
@@ -785,13 +872,11 @@ void consultaEquip(tEquip vEquip[MAX_EQUIP],int qEquip)
                     printf("Deseja procurar novamente?\n[S]im \t[N]ao");
                     printf("\nOpcao: ");
                     scanf("%c",&nconsulta);
+                    nconsulta = toupper(nconsulta);
                     limparBufferStdin();
-                    if(toupper(nconsulta) == 'N'){
-                        nr = 0;
-                    }
                 }
             }
-            while(nr == -1);
+            while(nr == -1 && nconsulta!='N');
             break;
 //Consulta por Local
         case 'L':
@@ -812,13 +897,11 @@ void consultaEquip(tEquip vEquip[MAX_EQUIP],int qEquip)
                     printf("Deseja procurar novamente?\n[S]im \t[N]ao");
                     printf("\nOpcao: ");
                     scanf("%c",&nconsulta);
+                    nconsulta = toupper(nconsulta);
                     limparBufferStdin();
-                    if(toupper(nconsulta) == 'N'){
-                        nr = -1;
-                    }
                 }
             }
-            while(nr == 0);
+            while(nr == 0 && nconsulta!='N');
             break;
 
         }
@@ -941,15 +1024,21 @@ void loadBinary(tEquip vEquip[MAX_EQUIP],tLab vLab[MAX_LAB]/*,tAvaria vAvaria*/,
     }
 }
 
-char fichExiste(void)
-{
+char fichExiste(void){
     char op = 'N';
     FILE *fp = fopen ("data.bin", "rb");
     if (fp!=NULL){
         fclose(fp);
-        printf("\nDados guardados encontrados.Deseja abrir?\n[S]im\t[N]ao \n Opcao: ");
-        scanf("%c", &op);
+        do{
+            printf("\nDados guardados encontrados.Deseja abrir?\n[S]im\t[N]ao \n Opcao: ");
+            scanf(" %c", &op);
+            op = toupper(op);
+            limparBufferStdin();
+            if(op != 'S' && op!='N'){
+                printf("Opçao Invalida!");
+            }
+        }while(op != 'S' && op!='N');
     }
-    return toupper(op);
+    return op;
 }
 //FINAL FICHEIRO

@@ -2,30 +2,38 @@
 <CodeBlocks_layout_file>
 	<FileVersion major="1" minor="0" />
 	<ActiveTarget name="Debug" />
-	<File name="proj_RF_JC.c" open="1" top="1" tabpos="1" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+	<File name="proj_RF_JC.c" open="1" top="1" tabpos="1" split="0" active="1" splitpos="0" zoom_1="-1" zoom_2="0">
 		<Cursor>
-			<Cursor1 position="6288" topLine="199" />
+			<Cursor1 position="33262" topLine="433" />
 		</Cursor>
 		<Folding>
-			<Collapse line="287" />
-			<Collapse line="317" />
-			<Collapse line="343" />
-			<Collapse line="369" />
-			<Collapse line="395" />
-			<Collapse line="419" />
-			<Collapse line="450" />
-			<Collapse line="476" />
-			<Collapse line="495" />
-			<Collapse line="561" />
-			<Collapse line="590" />
-			<Collapse line="612" />
-			<Collapse line="625" />
-			<Collapse line="638" />
-			<Collapse line="651" />
-			<Collapse line="664" />
-			<Collapse line="678" />
-			<Collapse line="830" />
-			<Collapse line="853" />
+			<Collapse line="205" />
+			<Collapse line="222" />
+			<Collapse line="238" />
+			<Collapse line="257" />
+			<Collapse line="300" />
+			<Collapse line="332" />
+			<Collapse line="358" />
+			<Collapse line="384" />
+			<Collapse line="410" />
+			<Collapse line="465" />
+			<Collapse line="492" />
+			<Collapse line="507" />
+			<Collapse line="556" />
+			<Collapse line="611" />
+			<Collapse line="624" />
+			<Collapse line="637" />
+			<Collapse line="650" />
+			<Collapse line="679" />
+			<Collapse line="701" />
+			<Collapse line="714" />
+			<Collapse line="727" />
+			<Collapse line="740" />
+			<Collapse line="753" />
+			<Collapse line="913" />
+			<Collapse line="936" />
+			<Collapse line="970" />
+			<Collapse line="997" />
 		</Folding>
 	</File>
 </CodeBlocks_layout_file>

@@ -66,7 +66,7 @@ char menuAlterarLab(void);
 char menuConsultaEquip(void);
 //LEITURA
 int lerInteiro(char msg[],int minimo, int maximo);
-int lerFloat(char msg[],float minimo, float maximo);
+float lerFloat(char msg[],float minimo, float maximo);
 void lerString(char msg[],char nome[], int maxCaracteres);
 void limparBufferStdin(void);
 void limparEcra(void);
@@ -207,7 +207,7 @@ int lerInteiro(char msg[],int minimo, int maximo){
     return numero;
 }
 
-int lerFloat(char msg[],float minimo, float maximo){
+float lerFloat(char msg[],float minimo, float maximo){
     float numero, aux;
     do
     {
